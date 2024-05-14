@@ -109,7 +109,7 @@ def main():
     ss["auc_cutoff"] = st.sidebar.number_input("Modle AUC cutoff >=", 0.5, max_value=0.99)
 
     ## 加载模型的pMHC
-    st.title("MixTCRpred model for the target pMHC")
+    st.title("MixTCRpred pretrained models for the target pMHC")
     readInfo("./pretrained_models/info_models.csv")
     
     if ss["df_info"] is not None:
@@ -174,7 +174,9 @@ def main():
         python_path = subprocess.run(["which", "python"], stdout=subprocess.PIPE, text=True).stdout.strip()
         st.write(python_path)
         #python MixTCRpred.py --model A0201_GILGFVFTL --input ./test/test.csv --output ./test/out_A0201_GILGFVFTL.csv
-        process1       = subprocess.Popen(["python", "MixTCRpred.py", "--model", pMHC_models_sel, "--input", \
+        # /SGRNJ/Public/Software/conda_env/MixTCRpred/bin/python
+        # /usr/local/bin/python
+        process1       = subprocess.Popen(["/usr/local/bin/python", "MixTCRpred.py", "--model", pMHC_models_sel, "--input", \
             tcr_csv, "--output", out_csv], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         return_code    = process1.wait()
         stdout, stderr = process1.communicate()
