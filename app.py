@@ -148,14 +148,15 @@ def main():
         ss["scTCR"] = pd.read_csv("./test/test.csv")
     elif input_selectbox == "Upload new":
         st.subheader("Upload your TCR data (csv format, separated by commas). Please refer to the demo data for detials.")
-        exp_file    = st.file_uploader("Choose a csv file for TCR inputs.",   type="csv", disabled=True)
-        ss["scTCR"] = pd.read_csv(exp_file)
+        tcr_file    = st.file_uploader("Choose a csv file for TCR inputs.",   type="csv", disabled=True)
+        ss["scTCR"] = pd.read_csv(tcr_file)
 
     if ss["scTCR"] is None:
         st.info('Next, please input TCR for analysis from the left slidebar!', icon="ℹ️")
         st.stop()
     else:
         st.title("Input TCRs for predictions:")
+        df = ss["scTCR"]
         st.dataframe(df, hide_index=True)
 
         ## 按user id存放文件
@@ -171,7 +172,7 @@ def main():
     if st.button("Running MixTCRpred!"):
         ss['results'] = None
         #python MixTCRpred.py --model A0201_GILGFVFTL --input ./test/test.csv --output ./test/out_A0201_GILGFVFTL.csv
-        process1       = subprocess.Popen(["python MixTCRpred.py", "--model", pMHC_models_sel, "--input", \
+        process1       = subprocess.Popen(["python", "MixTCRpred.py", "--model", pMHC_models_sel, "--input", \
             tcr_csv, "--output", out_csv], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         return_code    = process1.wait()
         stdout, stderr = process1.communicate()
