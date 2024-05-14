@@ -1,4 +1,5 @@
 import os
+
 from argparse import ArgumentParser
 from tabulate import tabulate
 import wget

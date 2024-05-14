@@ -171,6 +171,8 @@ def main():
 
     if st.button("Running MixTCRpred!"):
         ss['results'] = None
+        python_path = subprocess.run(["which", "python"], stdout=subprocess.PIPE, text=True).stdout.strip()
+        st.write(python_path)
         #python MixTCRpred.py --model A0201_GILGFVFTL --input ./test/test.csv --output ./test/out_A0201_GILGFVFTL.csv
         process1       = subprocess.Popen(["python", "MixTCRpred.py", "--model", pMHC_models_sel, "--input", \
             tcr_csv, "--output", out_csv], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
