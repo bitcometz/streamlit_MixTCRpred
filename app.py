@@ -77,7 +77,7 @@ def plot4pMHC(df, auc_min, auc_max, num_bins):
 def plot4result(df):
     df['names']   = "TRA:" + df['cdr3_TRA'] + "_" + "TRB:" + df['cdr3_TRB']
     df['sig']     = np.where(df['perc_rank'] < 0.01, "significant", "insignificant")
-    fig           = px.scatter(df, x='score', y='perc_rank', color='sig', hover_name='names')
+    fig           = px.scatter(df, x='score', y='perc_rank', color='sig', hover_name='names', color_discrete_map={'insignificant': 'gray', 'significant': 'red'})
 
     fig.update_layout(
         title="Predictions with scores and ranks",  # 设置图片标题
