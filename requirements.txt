@@ -1,0 +1,14 @@
+streamlit==1.33.0
+plotly
+Bio
+natsort
+numpy
+pandas
+pytorch_lightning
+scikit_learn
+scipy
+torch
+torchvision
+tqdm
+tabulate
+wget
