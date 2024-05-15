@@ -1,10 +1,7 @@
 import pkg_resources
 import subprocess
 
-import sys
 
-python_path = sys.executable
-st.write("Python Interpreter Path:", python_path)
 
 # 获取当前 Python 环境中已安装的所有包
 installed_packages = pkg_resources.working_set
