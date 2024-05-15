@@ -77,17 +77,17 @@ def plot4pMHC(df, auc_min, auc_max, num_bins):
 def plot4result(df):
     df['names']   = "TRA:" + df['cdr3_TRA'] + "_" + "TRB:" + df['cdr3_TRB']
     df['sig']     = np.where(df['perc_rank'] < 0.01, "significant", "insignificant")
-    fig           = px.scatter(df, x='score', y='perc_rank', color='sig', hover_name='names', color_discrete_map={'insignificant': 'gray', 'significant': 'red'})
+    fig           = px.scatter(df, y='score', x='perc_rank', color='sig', hover_name='names', color_discrete_map={'insignificant': 'gray', 'significant': 'red'})
 
     fig.update_layout(
         title="Predictions with scores and ranks",  # 设置图片标题
         title_x=0.3,
         xaxis = dict(
-            title = 'Score',
+            title = 'Rank',
             tickfont=dict(size=16)  # 设置 x 轴标签的字体大小为 14
         ),
         yaxis = dict(
-            title = 'Rank',
+            title = 'Score',
             tickfont=dict(size=16)  # 设置 y 轴标签的字体大小为 14
         ),
         font=dict(  # 设置标题的字体大小
