@@ -1,5 +1,4 @@
 import os
-
 from argparse import ArgumentParser
 from tabulate import tabulate
 import wget
@@ -21,6 +20,7 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--input', default=None)
     parser.add_argument('-o', '--output', default=None)
     parser.add_argument('-m', '--model', default= None)
+    parser.add_argument('-n', '--num_workers', default= 10)
     ### for large test set, increase the batch size
     parser.add_argument('--batch_size', type = int, default= 1)
     ### to download the model from Zenodo
@@ -252,13 +252,17 @@ if __name__ == '__main__':
         df_log['TRAV_corrected'] = [i.split("_")[1].replace('X', '') for i in test_seq]
         df_log['cdr1_TRA'] = [i.split("_")[2].replace('X', '') for i in test_seq]
         df_log['cdr2_TRA'] = [i.split("_")[3].replace('X', '') for i in test_seq]
-        df_log['cdr1_TRA'].replace('', np.nan, inplace = True)
-        df_log['cdr2_TRA'].replace('', np.nan, inplace = True)
+        #df_log['cdr1_TRA'].replace('', np.nan, inplace = True)
+        df_log['cdr1_TRA'] = df_log['cdr1_TRA'].replace('', np.nan)
+        #df_log['cdr2_TRA'].replace('', np.nan, inplace = True)
+        df_log['cdr2_TRA'] = df_log['cdr2_TRA'].replace('', np.nan)
         df_log['TRBV_corrected'] = [i.split("_")[4].replace('X', '') for i in test_seq]
         df_log['cdr1_TRB'] = [i.split("_")[5].replace('X', '') for i in test_seq]
         df_log['cdr2_TRB'] = [i.split("_")[6].replace('X', '') for i in test_seq]
-        df_log['cdr1_TRB'].replace('', np.nan, inplace = True)
-        df_log['cdr2_TRB'].replace('', np.nan, inplace = True)
+        #df_log['cdr1_TRB'].replace('', np.nan, inplace = True)
+        #df_log['cdr2_TRB'].replace('', np.nan, inplace = True)
+        df_log['cdr1_TRB'] = df_log['cdr1_TRB'].replace('', np.nan)
+        df_log['cdr2_TRB'] = df_log['cdr2_TRB'].replace('', np.nan)
         df_log = df_log.drop('epitope', axis = 1)
 
         #check missing entries

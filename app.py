@@ -8,21 +8,17 @@ import plotly.graph_objects as go
 import plotly.express as px
 import subprocess
 import atexit
+import numpy as np
 
 
 def showSGR():
     singleron_base64 = read_image("src/singleron.png")
     with st.sidebar:
         st.markdown("---")
-
+        st.markdown("This add is built by")
         st.markdown(
             f'<div style="margin-top: 0.25em; text-align: left;"><a href="https://singleron.bio/" target="_blank"><img src="data:image/png;base64,{singleron_base64}" alt="Homepage" style="object-fit: contain; max-width: 174px; max-height: 41px;"></a></div>',
             unsafe_allow_html=True,
-        )
-        st.markdown(
-            '''
-            sessupport@singleronbio.com
-            '''
         )
 
 def binaryswitch(session_state, keys):
@@ -77,9 +73,35 @@ def plot4pMHC(df, auc_min, auc_max, num_bins):
     fig.update_traces(marker=dict(size=10))  # 设置点的大小为10
     return fig
 
+def plot4result(df):
+    df['names']   = "TRA:" + df['cdr3_TRA'] + "_" + "TRB:" + df['cdr3_TRB']
+    df['sig']     = np.where(df['perc_rank'] < 0.01, "significant", "insignificant")
+    fig           = px.scatter(df, x='score', y='perc_rank', color='sig', hover_name='names')
+
+    fig.update_layout(
+        title="Predictions with scores and ranks",  # 设置图片标题
+        title_x=0.3,
+        xaxis = dict(
+            title = 'Score',
+            tickfont=dict(size=16)  # 设置 x 轴标签的字体大小为 14
+        ),
+        yaxis = dict(
+            title = 'Rank',
+            tickfont=dict(size=16)  # 设置 y 轴标签的字体大小为 14
+        ),
+        font=dict(  # 设置标题的字体大小
+            size=16
+        )
+    )
+    # 调整点的大小
+    fig.update_traces(marker=dict(size=10))  # 设置点的大小为10    
+    return fig
+
+
+
+
 #@st.cache_data
 def readInfo(file):
-    print("Reading:")
     ss["df_info"] = pd.read_csv(file)
 
 def main():
@@ -99,6 +121,13 @@ def main():
     ## 设置页面宽一些
     st.set_page_config(layout="wide")
     st.sidebar.markdown("# MixTCRpred")
+    st.markdown("## Background")
+    st.markdown(
+        '''
+        MixTCRpred is developed by [GfellerLab]((https://github.com/GfellerLab/MixTCRpred/tree/main)) and first published in [Nature Communications](https://www.nature.com/articles/s41467-024-47461-8).
+        MixTCRpred accurately predicts T-cell receptors (TCRs) recognizing several viral and cancer epitopes (peptides displayed on MHC molecules or pMHCs). Predictions are available for 146 pMHCs. Accurate predictions were achieved for 43 pMHCs that have more than 50 training TCRs.
+        ''')
+
     st.sidebar.markdown("## 1.MixTCRpred models")
     ss["Host_species"] = st.sidebar.selectbox(
         "Select which species to analyze:",
@@ -109,7 +138,7 @@ def main():
     ss["auc_cutoff"] = st.sidebar.number_input("Modle AUC cutoff >=", 0.5, max_value=0.99)
 
     ## 加载模型的pMHC
-    st.title("MixTCRpred pretrained models for the target pMHC")
+    st.title("Pretrained models for the target pMHC")
     readInfo("./pretrained_models/info_models.csv")
     
     if ss["df_info"] is not None:
@@ -170,23 +199,22 @@ def main():
 
 
     if st.button("Running MixTCRpred!"):
-        ss['results'] = None
-        python_path = subprocess.run(["which", "python"], stdout=subprocess.PIPE, text=True).stdout.strip()
-        st.write(python_path)
+        ss['results']  = None
+        python_path    = subprocess.run(["which", "python"], stdout=subprocess.PIPE, text=True).stdout.strip()
         #python MixTCRpred.py --model A0201_GILGFVFTL --input ./test/test.csv --output ./test/out_A0201_GILGFVFTL.csv
-        # /SGRNJ/Public/Software/conda_env/MixTCRpred/bin/python
-        # /usr/local/bin/python
-        process1       = subprocess.Popen(["/usr/local/bin/python", "MixTCRpred.py", "--model", pMHC_models_sel, "--input", \
-            tcr_csv, "--output", out_csv], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        return_code    = process1.wait()
-        stdout, stderr = process1.communicate()
+        #process1       = subprocess.Popen([python_path, "MixTCRpred.py", "--model", pMHC_models_sel, "--input", tcr_csv, "--output", out_csv], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        #return_code    = process1.wait()
+        #stdout, stderr = process1.communicate()
+        cmd_line     = " ".join([python_path, "MixTCRpred.py", "--model", pMHC_models_sel, "--input", tcr_csv, "--output", out_csv])
+        return_code  = os.system(cmd_line)
         if return_code == 0:
             st.write('MixTCRpred executed successfully!')
-            ss['results'] = pd.read_csv(out_csv)
+            ss['results'] = pd.read_csv(out_csv, comment='#')
         else:
             st.write('MixTCRpred runnning failed!')
             st.write("please check your data !")
             st.stop()
+
 
     ## 展示结果
     if ss['results'] is not None:
@@ -196,6 +224,9 @@ def main():
         df = ss['results']
         st.dataframe(df, hide_index=True)
         ## 以score和rank展示结果
+        fig_result = plot4result(df)
+        st.plotly_chart(fig_result, use_container_width=True)
+
 
 
     ## 展示公司和引用信息
